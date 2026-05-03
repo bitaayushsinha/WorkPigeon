@@ -4,7 +4,7 @@ WorkPigeon is an AI-powered task allocation platform built for software developm
 
 This was built as a Semester VI academic project.
 
-![Dashboard overview](screenshots/dashboard.png)
+<img width="2879" height="1430" alt="image" src="https://github.com/user-attachments/assets/c7cca296-7830-44d9-808c-3403a7b30390" />
 
 ---
 
@@ -14,6 +14,37 @@ The core idea is that assigning tasks manually is inefficient and biased. WorkPi
 
 The admin manages developers and tasks. Developers get a personal workspace with an AI chat assistant and a view of their own assigned work. All AI interactions are logged and factored into scoring over time.
 
+---
+
+## System architecture
+
+```mermaid
+graph TD
+    User([Admin / Developer]) --> |Interacts with| WebApp
+
+    subgraph Client ["Frontend (Next.js)"]
+        WebApp["Web UI (React/Tailwind)"]
+        ApiClient["API Client"]
+        WebApp --> ApiClient
+    end
+
+    ApiClient --> |REST API / JWT| API
+
+    subgraph Server ["Backend (FastAPI)"]
+        API["API Routers"]
+        Engine["Allocation Engine (Scoring)"]
+        Chatbot["AI Chat Service"]
+        ODM["Beanie ODM (Data Models)"]
+        
+        API --> Engine
+        API --> Chatbot
+        API --> ODM
+        Engine --> ODM
+    end
+
+    ODM --> |Async/Motor| Database[(MongoDB)]
+    Chatbot --> |Prompt/Context| OpenRouter["OpenRouter API (LLMs)"]
+```
 ---
 
 ## Scoring algorithm
@@ -27,7 +58,8 @@ Every developer is scored against a task out of 100 using this formula:
 
 The rebalance engine uses a least-flexibility-first approach: tasks with fewer qualified developers are assigned before tasks that anyone can do. Within the same priority tier, heavier tasks are distributed first to prevent large tasks from piling onto an already-loaded developer.
 
-![Allocation engine results showing score breakdowns per task](screenshots/allocation_engine.png)
+<img width="2362" height="1524" alt="image" src="https://github.com/user-attachments/assets/4e1543a3-e66f-47a0-b497-3b95de7029ab" />
+
 
 ---
 
@@ -37,11 +69,13 @@ The rebalance engine uses a least-flexibility-first approach: tasks with fewer q
 
 **Developers** — A card grid showing every registered developer. Each card shows workload level (Low / Medium / High), skills, commits, AI score, and an expandable list of assigned tasks. Admins can add or delete developers here.
 
-![Developers page with workload badges and assigned task lists](screenshots/developers.png)
+<img width="2370" height="1303" alt="image" src="https://github.com/user-attachments/assets/4c359991-79f5-4ccd-8f2a-e895207da350" />
+
 
 **Tasks** — A Kanban board with four columns: Unassigned, In Progress, Review, and Done. Each unassigned task has an Auto Assign button that runs the scoring engine and assigns it immediately.
 
-![Task Kanban board](screenshots/tasks_kanban.png)
+<img width="2360" height="1446" alt="image" src="https://github.com/user-attachments/assets/1fd33720-3352-4f56-a7b2-20f1b3becac5" />
+
 
 **Allocation Engine** — Runs a full team rebalance. Assigns all unassigned and in-progress tasks using the scoring algorithm and persists the results to the database.
 
@@ -49,7 +83,8 @@ The rebalance engine uses a least-flexibility-first approach: tasks with fewer q
 
 **Developer Workspace** — Personal page for each developer showing their tasks, deadlines, and an AI chatbot they can use for help.
 
-![Developer personal workspace with AI chat](screenshots/dev_workspace.png)
+<img width="2368" height="1418" alt="image" src="https://github.com/user-attachments/assets/15043e22-8f95-4838-8850-dfda701bcc0d" />
+
 
 ---
 
@@ -131,36 +166,6 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 ---
-
-## System architecture
-
-```mermaid
-graph TD
-    User([Admin / Developer]) --> |Interacts with| WebApp
-
-    subgraph Client ["Frontend (Next.js)"]
-        WebApp["Web UI (React/Tailwind)"]
-        ApiClient["API Client"]
-        WebApp --> ApiClient
-    end
-
-    ApiClient --> |REST API / JWT| API
-
-    subgraph Server ["Backend (FastAPI)"]
-        API["API Routers"]
-        Engine["Allocation Engine (Scoring)"]
-        Chatbot["AI Chat Service"]
-        ODM["Beanie ODM (Data Models)"]
-        
-        API --> Engine
-        API --> Chatbot
-        API --> ODM
-        Engine --> ODM
-    end
-
-    ODM --> |Async/Motor| Database[(MongoDB)]
-    Chatbot --> |Prompt/Context| OpenRouter["OpenRouter API (LLMs)"]
-```
 
 ## Project structure
 
