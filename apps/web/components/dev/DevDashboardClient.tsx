@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { api, User, Task, ChatMessage } from "@/lib/api";
 import {
   Send, Loader2, Brain, CheckCircle, Clock, GitCommit,
@@ -16,14 +16,14 @@ const MODELS = [
 ];
 
 const STATUS_LABEL: Record<string, { label: string; color: string; next: Task["status"] | null }> = {
-  unassigned: { label: "Unassigned", color: "text-slate-400",  next: "in_progress" },
-  in_progress: { label: "In Progress", color: "text-indigo-400", next: "review" },
-  review:      { label: "In Review",  color: "text-amber-400",  next: "done" },
-  done:        { label: "Done",       color: "text-emerald-400", next: null },
+  unassigned: { label: "Unassigned", color: "text-zinc-500 dark:text-zinc-400",  next: "in_progress" },
+  in_progress: { label: "In Progress", color: "text-blue-600 dark:text-blue-400", next: "review" },
+  review:      { label: "In Review",  color: "text-amber-600 dark:text-amber-400",  next: "done" },
+  done:        { label: "Done",       color: "text-emerald-600 dark:text-emerald-400", next: null },
 };
 
 const PRIORITY_DOT: Record<string, string> = {
-  low: "bg-slate-500", medium: "bg-blue-500", high: "bg-amber-500", critical: "bg-rose-500",
+  low: "bg-zinc-400 dark:bg-zinc-500", medium: "bg-blue-500", high: "bg-amber-500", critical: "bg-red-500",
 };
 
 // ── Task card ─────────────────────────────────────────────────────────────────
@@ -45,35 +45,35 @@ function TaskCard({ task, onStatusChange, onChatAbout }: {
   };
 
   return (
-    <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 hover:border-indigo-500/20 transition-all">
+    <div
+      className="bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-sm p-3 hover:border-gray-300 dark:hover:border-zinc-700 transition-all">
       <div className="flex items-start gap-3 mb-3">
         <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${PRIORITY_DOT[task.priority]}`} />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white leading-snug truncate">{task.title}</p>
-          <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{task.description}</p>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-snug truncate">{task.title}</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2">{task.description}</p>
         </div>
         <span className={`text-xs shrink-0 font-medium ${meta.color}`}>{meta.label}</span>
       </div>
 
       <div className="flex items-center gap-2 mt-3">
-        <span className="text-[10px] text-slate-600">{task.estimated_hours}h</span>
+        <span className="text-[10px] text-zinc-500 dark:text-zinc-400">{task.estimated_hours}h</span>
         <div className="flex-1" />
 
         <button onClick={() => onChatAbout(task)}
-          className="flex items-center gap-1 text-[10px] text-purple-400 hover:text-purple-300 border border-purple-500/20 hover:border-purple-500/40 rounded-lg px-2 py-1 transition-all">
+          className="flex items-center gap-1 text-[10px] text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 border border-purple-200 dark:border-purple-900/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-sm px-2 py-1 transition-all">
           <Sparkles className="w-3 h-3" /> Ask AI
         </button>
 
         {next && (
           <button onClick={advance} disabled={updating}
-            className="flex items-center gap-1 text-[10px] text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 hover:bg-indigo-500/10 rounded-lg px-2 py-1 transition-all">
+            className="flex items-center gap-1 text-[10px] text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-sm px-2 py-1 transition-all">
             {updating ? <Loader2 className="w-3 h-3 animate-spin" /> : <ChevronUp className="w-3 h-3" />}
             {next.replace("_", " ")}
           </button>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -82,32 +82,31 @@ function TaskCard({ task, onStatusChange, onChatAbout }: {
 function Bubble({ msg }: { msg: ChatMessage & { pending?: boolean } }) {
   const isUser = msg.role === "user";
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className={`flex items-end gap-2.5 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
-      <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isUser ? "bg-indigo-600" : "bg-purple-700"}`}>
-        {isUser ? <UserIcon className="w-3.5 h-3.5 text-white" /> : <Bot className="w-3.5 h-3.5 text-white" />}
+    <div
+      className={`flex items-end gap-2 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
+      <div className={`w-7 h-7 rounded-sm flex items-center justify-center shrink-0 ${isUser ? "bg-black dark:bg-white" : "bg-gray-200 dark:bg-zinc-700"}`}>
+        {isUser ? <UserIcon className="w-3.5 h-3.5 text-white dark:text-black" /> : <Bot className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-300" />}
       </div>
-      <div className={`max-w-[78%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+      <div className={`max-w-[78%] rounded-sm px-4 py-3 text-sm leading-relaxed ${
         isUser
-          ? "bg-indigo-600 text-white rounded-br-sm"
-          : "bg-white/[0.06] border border-white/[0.08] text-slate-200 rounded-bl-sm"
+          ? "bg-black dark:bg-white text-white dark:text-black"
+          : "bg-gray-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
       }`}>
         {msg.pending
           ? <span className="flex gap-1 items-center py-0.5">
-              <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0ms]" />
-              <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:150ms]" />
-              <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:300ms]" />
+              <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:0ms]" />
+              <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:150ms]" />
+              <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:300ms]" />
             </span>
           : <span style={{ whiteSpace: "pre-wrap" }}>{msg.content}</span>
         }
         {!msg.pending && msg.latency_ms && (
-          <p className="text-[10px] text-slate-500 mt-1.5">
+          <p className={`text-[10px] mt-1.5 ${isUser ? "text-zinc-300 dark:text-zinc-500" : "text-zinc-500 dark:text-zinc-400"}`}>
             {msg.model} · {msg.latency_ms}ms · {msg.tokens} tokens
           </p>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -120,7 +119,7 @@ export default function DevDashboardClient({ id }: { id: string }) {
 
   // Chat state
   const [messages, setMessages] = useState<(ChatMessage & { pending?: boolean })[]>([
-    { role: "assistant", content: "Hi! I'm your WorkPigeon AI assistant. Ask me anything about your tasks, coding, or architecture! 🚀" },
+    { role: "assistant", content: "Hi! I'm your WorkPigeon AI assistant. Ask me anything about your tasks, coding, or architecture!" },
   ]);
   const [input, setInput]       = useState("");
   const [sending, setSending]   = useState(false);
@@ -186,7 +185,7 @@ export default function DevDashboardClient({ id }: { id: string }) {
     } catch (e: any) {
       setMessages(prev => [
         ...prev.filter(m => !m.pending),
-        { role: "assistant", content: `⚠️ Error: ${e.message}` },
+        { role: "assistant", content: `[ERROR]: ${e.message}` },
       ]);
     } finally { setSending(false); }
   };
@@ -201,8 +200,8 @@ export default function DevDashboardClient({ id }: { id: string }) {
 
   if (!user) {
     return (
-      <div className="glass rounded-2xl p-12 text-center">
-        <p className="text-rose-400">Developer not found. Check the URL.</p>
+      <div className="office-panel p-12 text-center">
+        <p className="text-red-500">Developer not found. Check the URL.</p>
       </div>
     );
   }
@@ -211,70 +210,68 @@ export default function DevDashboardClient({ id }: { id: string }) {
   const doneTasks  = tasks.filter(t => t.status === "done");
 
   return (
-    <div className="h-[calc(100vh-6rem)] flex flex-col gap-6">
+    <div className="h-[calc(100vh-6rem)] flex flex-col gap-4">
       {/* ── Header ── */}
       <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-indigo-500/20">
+          <div className="w-12 h-12 rounded-sm bg-black dark:bg-white flex items-center justify-center text-xl font-bold text-white dark:text-black">
             {user.name.charAt(0)}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white font-[family-name:var(--font-outfit)]">
-              Hey, <span className="gradient-text">{user.name.split(" ")[0]}</span> 👋
+            <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-[family-name:var(--font-outfit)]">
+              Hey, {user.name.split(" ")[0]}
             </h1>
-            <p className="text-xs text-slate-400">{user.email}</p>
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{user.email}</p>
           </div>
         </div>
 
         {/* Quick stats */}
         <div className="hidden sm:flex items-center gap-4">
           {[
-            { icon: CheckCircle, label: "Active", value: myTasks.length, color: "text-indigo-400" },
-            { icon: Brain, label: "AI Score", value: `${user.ai_efficiency_score.toFixed(0)}`, color: "text-purple-400" },
-            { icon: GitCommit, label: "Commits", value: user.commits_today, color: "text-emerald-400" },
+            { icon: CheckCircle, label: "Active", value: myTasks.length, color: "text-blue-600 dark:text-blue-400" },
+            { icon: Brain, label: "AI Score", value: `${user.ai_efficiency_score.toFixed(0)}`, color: "text-purple-600 dark:text-purple-400" },
+            { icon: GitCommit, label: "Commits", value: user.commits_today, color: "text-emerald-600 dark:text-emerald-400" },
           ].map(s => (
-            <div key={s.label} className="glass rounded-xl px-4 py-2.5 text-center">
-              <p className={`text-lg font-bold font-[family-name:var(--font-outfit)] ${s.color}`}>{s.value}</p>
-              <p className="text-[10px] text-slate-500">{s.label}</p>
+            <div key={s.label} className="office-panel px-3 py-2 text-center">
+              <p className={`text-base font-bold font-[family-name:var(--font-outfit)] ${s.color}`}>{s.value}</p>
+              <p className="text-[9px] text-zinc-500 dark:text-zinc-400">{s.label}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* ── Main layout ── */}
-      <div className="flex-1 grid grid-cols-1 xl:grid-cols-[340px_1fr] gap-6 min-h-0">
+      <div className="flex-1 grid grid-cols-1 xl:grid-cols-[340px_1fr] gap-4 min-h-0">
 
         {/* ── Left: Tasks ── */}
         <div className="flex flex-col gap-4 overflow-y-auto pr-1">
           <div className="shrink-0">
-            <h2 className="text-sm font-semibold text-slate-300 mb-3 font-[family-name:var(--font-outfit)]">
+            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-3 font-[family-name:var(--font-outfit)]">
               My Tasks ({myTasks.length})
             </h2>
             {myTasks.length === 0 ? (
-              <div className="glass rounded-xl p-6 text-center">
-                <p className="text-slate-500 text-sm">No active tasks. Enjoy the calm! 🌿</p>
+              <div className="office-panel p-4 text-center">
+                <p className="text-zinc-500 dark:text-zinc-400 text-xs">No active tasks.</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                <AnimatePresence>
-                  {myTasks.map(t => (
-                    <TaskCard key={t.id} task={t}
-                      onStatusChange={handleStatusChange}
-                      onChatAbout={handleChatAbout} />
-                  ))}
-                </AnimatePresence>
+              <div className="space-y-2">
+                {myTasks.map(t => (
+                  <TaskCard key={t.id} task={t}
+                    onStatusChange={handleStatusChange}
+                    onChatAbout={handleChatAbout} />
+                ))}
               </div>
             )}
           </div>
 
           {doneTasks.length > 0 && (
             <div className="shrink-0">
-              <p className="text-xs text-slate-600 mb-2">Completed ({doneTasks.length})</p>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-2">Completed ({doneTasks.length})</p>
               <div className="space-y-2">
                 {doneTasks.map(t => (
-                  <div key={t.id} className="px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04] flex items-center gap-2">
-                    <CheckCircle className="w-3 h-3 text-emerald-500 shrink-0" />
-                    <p className="text-xs text-slate-500 truncate">{t.title}</p>
+                  <div key={t.id} className="px-3 py-2 rounded-sm bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-emerald-600 dark:text-emerald-500 shrink-0" />
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{t.title}</p>
                   </div>
                 ))}
               </div>
@@ -283,49 +280,47 @@ export default function DevDashboardClient({ id }: { id: string }) {
         </div>
 
         {/* ── Right: AI Chat ── */}
-        <div className="glass rounded-2xl flex flex-col min-h-0 overflow-hidden">
+        <div className="office-panel flex flex-col min-h-0 overflow-hidden">
           {/* Chat header */}
-          <div className="px-5 py-4 border-b border-white/[0.06] flex items-center gap-3 shrink-0">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
-              <Bot className="w-4 h-4 text-white" />
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-zinc-800 flex items-center gap-3 shrink-0">
+            <div className="w-8 h-8 rounded-sm bg-black dark:bg-white flex items-center justify-center">
+              <Bot className="w-4 h-4 text-white dark:text-black" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-white">WorkPigeon AI</p>
-              <p className="text-[10px] text-slate-500">All chats auto-logged • AI efficiency tracked</p>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">WorkPigeon AI</p>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400">All chats auto-logged • AI efficiency tracked</p>
             </div>
             {/* Model selector */}
             <select
               value={model} onChange={e => setModel(e.target.value)}
-              className="text-[10px] bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-slate-300 focus:outline-none focus:border-indigo-500">
-              {MODELS.map(m => <option key={m.id} value={m.id} className="bg-[#1a1a2e]">{m.label}</option>)}
+              className="text-[10px] bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-sm px-2 py-1.5 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-black dark:focus:border-white">
+              {MODELS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
             </select>
             {/* Phase selector */}
             <select
               value={phase} onChange={e => setPhase(e.target.value as typeof phase)}
-              className="text-[10px] bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-slate-300 focus:outline-none focus:border-indigo-500">
+              className="text-[10px] bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-sm px-2 py-1.5 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-black dark:focus:border-white">
               {["planning","coding","review","debug"].map(p => (
-                <option key={p} value={p} className="bg-[#1a1a2e]">{p}</option>
+                <option key={p} value={p}>{p}</option>
               ))}
             </select>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-            <AnimatePresence>
-              {messages.map((msg, i) => <Bubble key={i} msg={msg} />)}
-            </AnimatePresence>
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+            {messages.map((msg, i) => <Bubble key={i} msg={msg} />)}
             <div ref={bottomRef} />
           </div>
 
           {/* Input */}
-          <div className="px-5 py-4 border-t border-white/[0.06] shrink-0">
+          <div className="px-5 py-4 border-t border-gray-200 dark:border-zinc-800 shrink-0">
             {activeTaskId && (
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] text-purple-400 bg-purple-500/10 border border-purple-500/20 rounded px-2 py-0.5">
+                <span className="text-[10px] text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-900/50 rounded-sm px-2 py-0.5">
                   Asking about task
                 </span>
                 <button onClick={() => setActiveTaskId(undefined)}
-                  className="text-[10px] text-slate-500 hover:text-slate-300">✕ clear</button>
+                  className="text-[10px] text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">✕ clear</button>
               </div>
             )}
             <div className="flex gap-3 items-end">
@@ -335,11 +330,11 @@ export default function DevDashboardClient({ id }: { id: string }) {
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                 placeholder="Ask anything… (Shift+Enter for newline)"
-                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none"
+                className="flex-1 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-sm px-4 py-3 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-black dark:focus:border-white resize-none"
               />
               <button onClick={sendMessage} disabled={sending || !input.trim()}
-                className="flex items-center justify-center w-11 h-11 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-40 rounded-xl transition-all shrink-0">
-                {sending ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Send className="w-4 h-4 text-white" />}
+                className="flex items-center justify-center w-11 h-11 bg-black dark:bg-white disabled:opacity-40 rounded-sm transition-all shrink-0">
+                {sending ? <Loader2 className="w-4 h-4 text-white dark:text-black animate-spin" /> : <Send className="w-4 h-4 text-white dark:text-black" />}
               </button>
             </div>
           </div>

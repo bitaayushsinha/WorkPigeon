@@ -59,7 +59,24 @@ The rebalance engine uses a least-flexibility-first approach: tasks with fewer q
 
 - Node.js 18+
 - Python 3.11+
-- MongoDB running locally on port 27017 (or a remote URI)
+- MongoDB
+
+### Database Setup
+
+You need a MongoDB database to run this project. You have two options:
+
+**Option 1: Cloud (Recommended, Easiest)**
+1. Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register) and create a free account.
+2. Create a new free cluster (M0).
+3. Under "Database Access", create a new database user and password.
+4. Under "Network Access", allow access from anywhere (`0.0.0.0/0`).
+5. Click "Connect", choose "Drivers", and copy your connection string.
+6. Replace `<password>` with your password and use this as your `MONGO_URI` in the `.env` file.
+
+**Option 2: Local Install**
+1. Download and install [MongoDB Community Server](https://www.mongodb.com/try/download/community). 
+2. Make sure to install MongoDB Compass (included in the installer) to view your data visually.
+3. Once installed, the database will run locally by default at `mongodb://localhost:27017`. You can use this as your `MONGO_URI` in the `.env` file.
 
 ### Backend
 
@@ -114,6 +131,36 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 ---
+
+## System architecture
+
+```mermaid
+graph TD
+    User([Admin / Developer]) --> |Interacts with| WebApp
+
+    subgraph Client ["Frontend (Next.js)"]
+        WebApp["Web UI (React/Tailwind)"]
+        ApiClient["API Client"]
+        WebApp --> ApiClient
+    end
+
+    ApiClient --> |REST API / JWT| API
+
+    subgraph Server ["Backend (FastAPI)"]
+        API["API Routers"]
+        Engine["Allocation Engine (Scoring)"]
+        Chatbot["AI Chat Service"]
+        ODM["Beanie ODM (Data Models)"]
+        
+        API --> Engine
+        API --> Chatbot
+        API --> ODM
+        Engine --> ODM
+    end
+
+    ODM --> |Async/Motor| Database[(MongoDB)]
+    Chatbot --> |Prompt/Context| OpenRouter["OpenRouter API (LLMs)"]
+```
 
 ## Project structure
 
