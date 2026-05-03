@@ -2,8 +2,6 @@
 
 WorkPigeon is an AI-powered task allocation platform built for software development teams. It uses a multi-metric scoring engine to intelligently assign and rebalance tasks across developers based on their current workload, skills, past performance, and AI usage efficiency.
 
-This was built as a Semester VI academic project.
-
 <img width="2879" height="1430" alt="image" src="https://github.com/user-attachments/assets/c7cca296-7830-44d9-808c-3403a7b30390" />
 
 ---
